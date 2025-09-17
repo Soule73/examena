@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PermissionHelper
 {
@@ -72,13 +73,6 @@ class PermissionHelper
         }
 
         $user = Auth::user();
-        
-        // D'abord vérifier la colonne 'role' dans la table users
-        if ($user->role) {
-            return $user->role;
-        }
-        
-        // Fallback sur les rôles Spatie
         $roles = $user->getRoleNames();
         
         // Prioriser admin > teacher > student
@@ -99,6 +93,9 @@ class PermissionHelper
     public static function getDashboardRoute(): string
     {
         $role = self::getUserMainRole();
+        
+        // Debug temporaire
+        Log::info('Debug redirection - Role detecté: ' . $role . ' pour utilisateur: ' . (Auth::check() ? Auth::user()->email : 'non connecté'));
         
         return match($role) {
             'admin' => '/dashboard/admin',

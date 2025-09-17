@@ -64,7 +64,6 @@ class UserManagementController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
         ]);
 
         // Assigner le rôle Spatie
@@ -89,7 +88,7 @@ class UserManagementController extends Controller
     public function edit(User $user)
     {
         $roles = ['student', 'teacher'];
-        $userRole = $user->role; // Récupérer le rôle actuel de l'utilisateur
+        $userRole = $user->getRoleNames()->first(); // Récupérer le rôle Spatie actuel
         return view('admin.users.edit', compact('user', 'roles', 'userRole'));
     }
 
@@ -108,7 +107,6 @@ class UserManagementController extends Controller
         $data = [
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
         ];
 
         // Mettre à jour le mot de passe seulement s'il est fourni
