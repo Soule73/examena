@@ -15,6 +15,7 @@ class Question extends Model
         'exam_id',
         'content',
         'type',
+        'points',
     ];
 
     /**

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'easymde/dist/easymde.min.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -38,4 +39,88 @@
     --color-gray-700: #374151;
     --color-gray-800: #1f2937;
     --color-gray-900: #111827;
+}
+
+/* Styles personnalisés pour EasyMDE */
+.EasyMDEContainer {
+    @apply rounded-lg border border-gray-200;
+}
+
+.EasyMDEContainer .editor-toolbar {
+    @apply border-b border-gray-200 bg-gray-50 rounded-t-lg;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+    @apply text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded;
+}
+
+.EasyMDEContainer .editor-toolbar button.active {
+    @apply text-blue-600 bg-blue-50;
+}
+
+.EasyMDEContainer .CodeMirror {
+    @apply rounded-b-lg;
+    border: none !important;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.EasyMDEContainer .CodeMirror-focused {
+    @apply ring-2 ring-blue-500;
+}
+
+.EasyMDEContainer .editor-preview {
+    @apply rounded-b-lg bg-white;
+}
+
+.EasyMDEContainer .editor-preview h1,
+.EasyMDEContainer .editor-preview h2,
+.EasyMDEContainer .editor-preview h3 {
+    @apply font-semibold text-gray-900 mb-2;
+}
+
+.EasyMDEContainer .editor-preview h1 {
+    @apply text-xl;
+}
+
+.EasyMDEContainer .editor-preview h2 {
+    @apply text-lg;
+}
+
+.EasyMDEContainer .editor-preview h3 {
+    @apply text-base;
+}
+
+.EasyMDEContainer .editor-preview p {
+    @apply text-gray-700 mb-2;
+}
+
+.EasyMDEContainer .editor-preview ul,
+.EasyMDEContainer .editor-preview ol {
+    @apply ml-4 mb-2;
+}
+
+.EasyMDEContainer .editor-preview ul {
+    @apply list-disc;
+}
+
+.EasyMDEContainer .editor-preview ol {
+    @apply list-decimal;
+}
+
+.EasyMDEContainer .editor-preview blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic text-gray-600 bg-blue-50 py-2 mb-2;
+}
+
+.EasyMDEContainer .editor-preview code {
+    @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.EasyMDEContainer .editor-preview pre {
+    @apply bg-gray-100 p-3 rounded mb-2 overflow-x-auto;
+}
+
+.EasyMDEContainer .editor-preview pre code {
+    @apply bg-transparent p-0;
 }

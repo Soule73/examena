@@ -149,30 +149,24 @@ class ModelTest extends TestCase
     public function exam_has_correct_fillable_attributes()
     {
         $exam = new Exam();
-        $expected = ['title', 'description', 'duration', 'teacher_id'];
-        
-        $this->assertEquals($expected, $exam->getFillable());
-    }
+        $expected = ['title', 'description', 'duration', 'start_time', 'end_time', 'is_active', 'teacher_id'];
 
-    /** @test */
+        $this->assertEquals($expected, $exam->getFillable());
+    }    /** @test */
     public function question_has_correct_fillable_attributes()
     {
         $question = new Question();
-        $expected = ['exam_id', 'content', 'type'];
-        
-        $this->assertEquals($expected, $question->getFillable());
-    }
+        $expected = ['exam_id', 'content', 'type', 'points'];
 
-    /** @test */
+        $this->assertEquals($expected, $question->getFillable());
+    }    /** @test */
     public function choice_has_correct_fillable_attributes()
     {
         $choice = new Choice();
-        $expected = ['question_id', 'label', 'is_correct'];
-        
-        $this->assertEquals($expected, $choice->getFillable());
-    }
+        $expected = ['question_id', 'content', 'is_correct'];
 
-    /** @test */
+        $this->assertEquals($expected, $choice->getFillable());
+    }    /** @test */
     public function answer_has_correct_fillable_attributes()
     {
         $answer = new Answer();

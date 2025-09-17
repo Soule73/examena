@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Teacher\ExamController;
 use App\Http\Controllers\Admin\UserManagementController;
 
 // Routes publiques
@@ -28,6 +29,30 @@ Route::middleware('auth')->group(function () {
     
     Route::middleware('role:teacher')->group(function () {
         Route::get('/dashboard/teacher', [DashboardController::class, 'teacher'])->name('teacher.dashboard');
+        
+        // Routes de gestion des examens pour les enseignants
+        // Exam routes for teachers
+        Route::controller(\App\Http\Controllers\Teacher\ExamController::class)
+            ->prefix('teacher/exams')
+            ->name('teacher.exams.')
+            ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{exam}', 'show')->name('show');
+            Route::get('/{exam}/edit', 'edit')->name('edit');
+            Route::put('/{exam}', 'update')->name('update');
+            Route::delete('/{exam}', 'destroy')->name('destroy');
+            Route::post('/{exam}/duplicate', 'duplicate')->name('duplicate');
+            Route::patch('/{exam}/toggle-active', 'toggleActive')->name('toggle-active');
+            Route::get('/{exam}/stats', 'stats')->name('stats');
+            
+            // Routes d'assignation d'examens
+            Route::get('/{exam}/assign', 'showAssignForm')->name('assign');
+            Route::post('/{exam}/assign', 'assignToStudents')->name('assign.store');
+            Route::get('/{exam}/assignments', 'showAssignments')->name('assignments');
+            Route::delete('/{exam}/assignments/{user}', 'removeAssignment')->name('assignment.remove');
+            });
     });
     
     Route::middleware('role:admin')->group(function () {

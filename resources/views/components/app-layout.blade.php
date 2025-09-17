@@ -1,7 +1,7 @@
 @props(['title' => null])
 
 <x-layout :title="$title">
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -24,7 +24,8 @@
                                 class="text-gray-600 hover:text-primary-600 px-3 py-2 text-sm font-medium">Examens</a>
                         @endcan
                         @can('create-exams')
-                            <a href="#" class="text-gray-600 hover:text-primary-600 px-3 py-2 text-sm font-medium">Mes
+                            <a href="{{ route('teacher.exams.index') }}"
+                                class="text-gray-600 hover:text-primary-600 px-3 py-2 text-sm font-medium">Mes
                                 Examens</a>
                         @endcan
                         @role('admin')
@@ -55,7 +56,7 @@
                         </button>
 
                         <div id="user-menu"
-                            class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            class="hidden absolute right-0 mt-2 w-48 rounded-md bg-white ring-1 ring-black ring-opacity-5">
                             <div class="py-1">
                                 <a href="#"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil</a>

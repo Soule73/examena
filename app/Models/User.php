@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -62,6 +63,24 @@ class User extends Authenticatable
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);
+    }
+
+    /**
+     * Relation avec les assignations d'examens (pour les étudiants)
+     */
+    public function examAssignments(): HasMany
+    {
+        return $this->hasMany(ExamAssignment::class, 'student_id');
+    }
+
+    /**
+     * Relation avec les examens assignés (pour les étudiants)
+     */
+    public function assignedExams(): BelongsToMany
+    {
+        return $this->belongsToMany(Exam::class, 'exam_assignments', 'student_id', 'exam_id')
+                    ->withPivot(['assigned_at', 'started_at', 'submitted_at', 'score', 'status', 'teacher_notes'])
+                    ->withTimestamps();
     }
 
     /**

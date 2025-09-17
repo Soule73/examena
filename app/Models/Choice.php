@@ -12,7 +12,7 @@ class Choice extends Model
 
     protected $fillable = [
         'question_id',
-        'label',
+        'content',
         'is_correct',
     ];
 

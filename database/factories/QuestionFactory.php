@@ -23,7 +23,8 @@ class QuestionFactory extends Factory
         return [
             'exam_id' => Exam::factory(),
             'content' => $this->faker->sentence() . '?',
-            'type' => $this->faker->randomElement(['multiple_choice', 'text']),
+            'type' => $this->faker->randomElement(['multiple_choice', 'true_false', 'text']),
+            'points' => $this->faker->numberBetween(1, 20),
         ];
     }
 }

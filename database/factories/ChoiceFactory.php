@@ -22,7 +22,7 @@ class ChoiceFactory extends Factory
     {
         return [
             'question_id' => Question::factory(),
-            'label' => $this->faker->randomElement(['A', 'B', 'C', 'D']),
+            'content' => $this->faker->sentence(3),
             'is_correct' => false,
         ];
     }
