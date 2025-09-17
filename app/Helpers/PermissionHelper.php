@@ -71,7 +71,15 @@ class PermissionHelper
             return null;
         }
 
-        $roles = Auth::user()->getRoleNames();
+        $user = Auth::user();
+        
+        // D'abord vérifier la colonne 'role' dans la table users
+        if ($user->role) {
+            return $user->role;
+        }
+        
+        // Fallback sur les rôles Spatie
+        $roles = $user->getRoleNames();
         
         // Prioriser admin > teacher > student
         if ($roles->contains('admin')) {
@@ -93,9 +101,9 @@ class PermissionHelper
         $role = self::getUserMainRole();
         
         return match($role) {
-            'admin' => '/admin/dashboard',
-            'teacher' => '/teacher/dashboard',
-            'student' => '/student/dashboard',
+            'admin' => '/dashboard/admin',
+            'teacher' => '/dashboard/teacher',
+            'student' => '/dashboard/student',
             default => '/dashboard'
         };
     }
