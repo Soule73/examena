@@ -4,9 +4,43 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class ExamAssignment
+ *
+ * Represents an assignment of an exam to a user or group.
+ *
+ * @property int $id The primary key of the exam assignment.
+ * @property int $exam_id The ID of the related exam.
+ * @property int $student_id The ID of the assigned student.
+ * @property \Illuminate\Support\Carbon|null $started_at The date and time when the exam was started.
+ * @property \Illuminate\Support\Carbon|null $submitted_at The date and time when the exam was submitted.
+ * @property float|null $score The score obtained in the exam.
+ * @property float|null $auto_score The automatically calculated score for the exam.
+ * @property \Illuminate\Support\Carbon|null $assigned_at The date and time when the exam was assigned.
+ * @property \Illuminate\Support\Carbon|null $completed_at The date and time when the exam was completed.
+ * @property string|null $status The current status of the assignment.
+ * @property \Illuminate\Support\Carbon|null $created_at The date and time when the record was created.
+ * @property \Illuminate\Support\Carbon|null $updated_at The date and time when the record was last updated.
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAssignment newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAssignment newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamAssignment query()
+ *
+ * @property-read \App\Models\Exam $exam The related exam.
+ * @property-read \App\Models\User $student The assigned student.
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Answer> $answers The answers associated with this assignment.
+ *
+ * @mixin \Eloquent
+ */
 class ExamAssignment extends Model
 {
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'exam_id',
         'student_id',
@@ -14,19 +48,37 @@ class ExamAssignment extends Model
         'started_at',
         'submitted_at',
         'score',
+        'auto_score',
         'status',
+        'attempt_number',
         'teacher_notes',
-    ];
-
-    protected $casts = [
-        'assigned_at' => 'datetime',
-        'started_at' => 'datetime',
-        'submitted_at' => 'datetime',
-        'score' => 'decimal:2',
+        'security_violations',
+        'forced_submission',
+        'time_spent',
     ];
 
     /**
-     * Relation avec l'examen
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    public function casts(): array
+    {
+        return [
+            'assigned_at' => 'datetime',
+            'started_at' => 'datetime',
+            'submitted_at' => 'datetime',
+            'score' => 'decimal:2',
+            'auto_score' => 'decimal:2',
+            'security_violations' => 'array',
+            'forced_submission' => 'boolean',
+        ];
+    }
+
+    /**
+     * Get the exam that is associated with this assignment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Exam, self>
      */
     public function exam(): BelongsTo
     {
@@ -34,7 +86,9 @@ class ExamAssignment extends Model
     }
 
     /**
-     * Relation avec l'étudiant
+     * Get the student that is associated with this assignment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\User, self>
      */
     public function student(): BelongsTo
     {
@@ -42,7 +96,22 @@ class ExamAssignment extends Model
     }
 
     /**
-     * Scope pour les assignations en attente
+     * Get the answers that are associated with this assignment.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Answer>
+     */
+    public function answers(): HasMany
+    {
+        return $this->hasMany(Answer::class, 'assignment_id');
+    }
+
+    /**
+     * Scope a query to only include assigned exam assignments.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     *
+     * @noinspection PhpUnused
      */
     public function scopeAssigned($query)
     {
@@ -52,13 +121,22 @@ class ExamAssignment extends Model
     /**
      * Scope pour les assignations commencées
      */
+    /**
+     * Scope a query to only include exam assignments that have been started.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeStarted($query)
     {
         return $query->where('status', 'started');
     }
 
     /**
-     * Scope pour les assignations soumises
+     * Scope a query to only include submitted exam assignments.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeSubmitted($query)
     {
@@ -66,7 +144,9 @@ class ExamAssignment extends Model
     }
 
     /**
-     * Vérifier si l'assignation est en cours
+     * Determine if the exam assignment is currently in progress.
+     *
+     * @return bool True if the exam assignment is in progress, false otherwise.
      */
     public function isInProgress(): bool
     {
@@ -74,7 +154,9 @@ class ExamAssignment extends Model
     }
 
     /**
-     * Vérifier si l'assignation est terminée
+     * Determine if the exam assignment has been completed.
+     *
+     * @return bool True if the exam assignment is completed, false otherwise.
      */
     public function isCompleted(): bool
     {

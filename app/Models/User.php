@@ -4,16 +4,40 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Class User
+ *
+ * Represents a user of the application.
+ *
+ * @property int $id The unique identifier for the user.
+ * @property string $name The name of the user.
+ * @property string $email The email address of the user.
+ * @property \Illuminate\Support\Carbon|null $email_verified_at The date and time when the user's email was verified.
+ * @property string $password The hashed password of the user.
+ * @property string|null $remember_token The token used to remember the user.
+ * @property \Illuminate\Support\Carbon|null $created_at The date and time when the user was created.
+ * @property \Illuminate\Support\Carbon|null $updated_at The date and time when the user was last updated.
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|Question newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Question newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Question query()
+ * 
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Exam> $exams The exams created by the user (if teacher).
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ExamAssignment> $examAssignments The exam assignments for the user (if student).
+ *
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, 
+        Notifiable, 
+        HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -50,7 +74,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les examens créés (pour les enseignants)
+     * Get the exams associated with the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Exam>
      */
     public function exams(): HasMany
     {
@@ -58,44 +84,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Relation avec les réponses données (pour les étudiants)
-     */
-    public function answers(): HasMany
-    {
-        return $this->hasMany(Answer::class);
-    }
-
-    /**
-     * Relation avec les assignations d'examens (pour les étudiants)
+     * Get the exam assignments associated with the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ExamAssignment>
      */
     public function examAssignments(): HasMany
     {
         return $this->hasMany(ExamAssignment::class, 'student_id');
-    }
-
-    /**
-     * Relation avec les examens assignés (pour les étudiants)
-     */
-    public function assignedExams(): BelongsToMany
-    {
-        return $this->belongsToMany(Exam::class, 'exam_assignments', 'student_id', 'exam_id')
-                    ->withPivot(['assigned_at', 'started_at', 'submitted_at', 'score', 'status', 'teacher_notes'])
-                    ->withTimestamps();
-    }
-
-    /**
-     * Vérifier si l'utilisateur est un enseignant
-     */
-    public function isTeacher(): bool
-    {
-        return $this->role === 'teacher';
-    }
-
-    /**
-     * Vérifier si l'utilisateur est un étudiant
-     */
-    public function isStudent(): bool
-    {
-        return $this->role === 'student';
     }
 }

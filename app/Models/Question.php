@@ -7,11 +7,40 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class Question
+ *
+ * Represents a question entity in the application.
+ *
+ * @property int $id The unique identifier for the question.
+ * @property string $content The text of the question.
+ * @property string $type The type of the question Available(‘multiple_choice’, ‘true_false’, ‘one_choice’, ‘text’).
+ * @property int $points The points assigned to the question.
+ * @property int $exam_id The ID of the related exam.
+ * @property \Illuminate\Support\Carbon|null $created_at The date and time when the question was created.
+ * @property \Illuminate\Support\Carbon|null $updated_at The date and time when the question was last updated.
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|Question newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Question newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Question query()
+ * 
+ * @property-read \App\Models\Exam $exam The exam to which the question belongs.
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Choice> $choices The choices associated with the question (for multiple choice questions).
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Answer> $answers The answers provided by students for this question.
+ *
+ * @mixin \Eloquent
+ */
 class Question extends Model
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
-    protected $fillable = [
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [ 
         'exam_id',
         'content',
         'type',
@@ -19,7 +48,9 @@ class Question extends Model
     ];
 
     /**
-     * Relation avec l'examen
+     * Get the exam that owns the question.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Exam, self>
      */
     public function exam(): BelongsTo
     {
@@ -27,7 +58,9 @@ class Question extends Model
     }
 
     /**
-     * Relation avec les choix (pour les QCM)
+     * Get the choices associated with the question (for multiple choice questions).
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Choice>
      */
     public function choices(): HasMany
     {
@@ -35,7 +68,9 @@ class Question extends Model
     }
 
     /**
-     * Relation avec les réponses des étudiants
+     * Get the answers provided by students for this question.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Answer>
      */
     public function answers(): HasMany
     {
