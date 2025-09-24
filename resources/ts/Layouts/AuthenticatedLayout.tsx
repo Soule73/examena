@@ -8,7 +8,6 @@ import {
     UserMenu,
     MobileMenuButton
 } from '@/Components/Navigation';
-import { ToastProvider, ToastContainer } from '@/Components/Toast';
 import FlashToastHandler from '@/Components/Toast/FlashToastHandler';
 
 interface AuthenticatedLayoutProps {
@@ -40,7 +39,7 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
     const currentHref = useMemo(() => window.location.href, []);
 
     return (
-        <ToastProvider defaultPosition="top-right">
+        <>
             <Head title={title} />
 
             <div className="min-h-screen bg-gray-50">
@@ -98,11 +97,9 @@ const AuthenticatedLayout = ({ children, title }: AuthenticatedLayoutProps) => {
                         {children}
                     </div>
                 </main>
-
                 <FlashToastHandler flash={flash} />
-                <ToastContainer />
             </div>
-        </ToastProvider>
+        </>
     );
 };
 

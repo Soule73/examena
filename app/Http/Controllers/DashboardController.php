@@ -2,169 +2,132 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
+use Inertia\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Helpers\PermissionHelper;
+use App\Services\ExamService;
+use Illuminate\Http\RedirectResponse;
+use App\Services\Shared\DashboardService;
+use App\Services\Admin\AdminDashboardService;
+use App\Services\Teacher\TeacherDashboardService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DashboardController extends Controller
 {
+    use AuthorizesRequests;
+
+    public function __construct(
+        private readonly ExamService $examService,
+        private readonly DashboardService $dashboardService,
+        private readonly TeacherDashboardService $teacherDashboardService,
+        private readonly AdminDashboardService $adminDashboardService
+    ) {}
+
+
     /**
-     * Dashboard principal - redirection selon le rôle
+     * Display the dashboard index page.
+     *
+     * @return \Illuminate\Http\RedirectResponse Redirects to the appropriate route.
      */
-    public function index()
+    public function index(): RedirectResponse
     {
-        $role = PermissionHelper::getUserMainRole();
-        
-        return match($role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'teacher' => redirect()->route('teacher.dashboard'),
-            'student' => redirect()->route('student.dashboard'),
-            default => abort(403, 'Rôle non reconnu')
-        };
+        try {
+            $route = $this->dashboardService->getDashboardRoute();
+            return redirect()->route($route);
+        } catch (\Exception $e) {
+            abort(403, $e->getMessage());
+        }
     }
 
     /**
-     * Dashboard étudiant
+     * Handles the request to display the student dashboard.
+     *
+     * @param \Illuminate\Http\Request $request The incoming HTTP request.
+     * @return \Illuminate\Http\Response The response containing the student dashboard view.
      */
-    public function student()
+    public function student(Request $request): Response
     {
-        $user = Auth::user();
-        
-        // Calculer les statistiques pour l'étudiant
-        $exams_available = \App\Models\Exam::count();
-        $exams_completed = \App\Models\Answer::where('user_id', $user->id)->distinct('exam_id')->count();
-        
-        // Calculer la moyenne des scores
-        $user_answers = \App\Models\Answer::where('user_id', $user->id)->get();
-        $average_score = 0;
-        if ($user_answers->count() > 0) {
-            $total_questions = $user_answers->count();
-            $correct_answers = 0;
-            
-            foreach ($user_answers as $answer) {
-                $question = $answer->question;
-                if ($question && $question->type === 'multiple_choice') {
-                    $correctChoice = $question->choices()->where('is_correct', true)->first();
-                    if ($correctChoice && $answer->answer_text === $correctChoice->label) {
-                        $correct_answers++;
-                    }
-                }
-            }
-            
-            $average_score = round(($correct_answers / $total_questions) * 100, 1);
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        if (!$user) {
+            abort(401, 'Utilisateur non authentifié');
         }
 
-        $stats = [
-            'exams_available' => $exams_available,
-            'exams_completed' => $exams_completed,
-            'average_score' => $average_score
-        ];
-
-        return view('dashboard.student', compact('user', 'stats'));
-    }
-
-    /**
-     * Dashboard enseignant
-     */
-    public function teacher()
-    {
-        $user = Auth::user();
-        
-        // Calculer les statistiques pour l'enseignant
-        $total_exams = \App\Models\Exam::where('teacher_id', $user->id)->count();
-        $total_questions = \App\Models\Question::whereIn('exam_id', 
-            \App\Models\Exam::where('teacher_id', $user->id)->pluck('id')
-        )->count();
-        
-        // Nombre d'étudiants qui ont répondu à ses examens
-        $students_evaluated = \App\Models\Answer::whereHas('question', function ($query) use ($user) {
-            $query->whereHas('exam', function ($q) use ($user) {
-                $q->where('teacher_id', $user->id);
-            });
-        })->distinct('user_id')->count();
-        
-        // Moyenne des scores sur ses examens
-        $teacher_exam_answers = \App\Models\Answer::whereHas('question', function ($query) use ($user) {
-            $query->whereHas('exam', function ($q) use ($user) {
-                $q->where('teacher_id', $user->id);
-            });
-        })->get();
-        
-        $average_score = 0;
-        if ($teacher_exam_answers->count() > 0) {
-            $user_scores = [];
-            
-            foreach ($teacher_exam_answers as $answer) {
-                $user_id = $answer->user_id;
-                if (!isset($user_scores[$user_id])) {
-                    $user_scores[$user_id] = ['correct' => 0, 'total' => 0];
-                }
-                
-                $user_scores[$user_id]['total']++;
-                $question = $answer->question;
-                if ($question && $question->type === 'multiple_choice') {
-                    $correctChoice = $question->choices()->where('is_correct', true)->first();
-                    if ($correctChoice && $answer->answer_text === $correctChoice->label) {
-                        $user_scores[$user_id]['correct']++;
-                    }
-                }
-            }
-            
-            $total_score = 0;
-            foreach ($user_scores as $scores) {
-                if ($scores['total'] > 0) {
-                    $total_score += ($scores['correct'] / $scores['total']) * 100;
-                }
-            }
-            
-            if (count($user_scores) > 0) {
-                $average_score = round($total_score / count($user_scores), 1);
-            }
+        if (!$this->dashboardService->canAccessDashboard('student', $user)) {
+            abort(403, 'Accès non autorisé au dashboard étudiant');
         }
 
-        // Récupérer les examens récents
-        $recent_exams = \App\Models\Exam::where('teacher_id', $user->id)
-            ->withCount('questions')
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        $allAssignments = $this->examService->getAssignedExamsForStudent($user, null);
 
-        $stats = [
-            'total_exams' => $total_exams,
-            'total_questions' => $total_questions,
-            'students_evaluated' => $students_evaluated,
-            'average_score' => $average_score
-        ];
+        $stats = $this->examService->getStudentDashboardStats($allAssignments);
 
-        return view('dashboard.teacher', compact('user', 'stats', 'recent_exams'));
+        $examAssignments = $this->examService->getAssignedExamsForStudent($user, 10);
+
+        return Inertia::render('Dashboard/Student', [
+            'user' => $user,
+            'stats' => $stats,
+            'examAssignments' => $examAssignments
+        ]);
     }
 
     /**
-     * Dashboard administrateur
+     * Handle the request for the teacher dashboard.
+     *
+     * @param \Illuminate\Http\Request $request The incoming HTTP request.
+     * @return \Illuminate\Http\Response The response containing the teacher dashboard data.
      */
-    public function admin()
+    public function teacher(Request $request): Response
     {
-        $user = Auth::user();
-        
-        // Calculer les statistiques globales pour l'admin
-        $total_users = \App\Models\User::count();
-        $students_count = \App\Models\User::role('student')->count();
-        $teachers_count = \App\Models\User::role('teacher')->count();
-        $total_exams = \App\Models\Exam::count();
+        /** @var \App\Models\User $user */
+        $user = $request->user();
 
-        // Récupérer les utilisateurs récents
-        $recent_users = \App\Models\User::with('roles')
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        if (!$user) {
+            abort(401, 'Utilisateur non authentifié');
+        }
 
-        $stats = [
-            'total_users' => $total_users,
-            'students_count' => $students_count,
-            'teachers_count' => $teachers_count,
-            'total_exams' => $total_exams
-        ];
+        if (!$this->dashboardService->canAccessDashboard('teacher', $user)) {
+            abort(403, 'Accès non autorisé au dashboard professeur');
+        }
 
-        return view('dashboard.admin', compact('user', 'stats', 'recent_users'));
+        $dashboardData = $this->teacherDashboardService->getDashboardData($user);
+
+        return Inertia::render('Dashboard/Teacher', [
+            'user' => $user,
+            'stats' => $dashboardData['stats'],
+            'recent_exams' => $dashboardData['recent_exams'],
+            'pending_reviews' => $dashboardData['pending_reviews']
+        ]);
+    }
+
+    /**
+     * Handle the admin dashboard request.
+     *
+     * @param \Illuminate\Http\Request $request The incoming HTTP request.
+     * @return \Illuminate\Http\Response The response to be sent back to the client.
+     */
+    public function admin(Request $request): Response
+    {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        if (!$user) {
+            abort(401, 'Utilisateur non authentifié');
+        }
+
+        if (!$this->dashboardService->canAccessDashboard('admin', $user)) {
+            abort(403, 'Accès non autorisé au dashboard administrateur');
+        }
+
+        $dashboardData = $this->adminDashboardService->getDashboardData();
+
+        return Inertia::render('Dashboard/Admin', [
+            'user' => $user,
+            'stats' => $dashboardData['stats'],
+            'activity_stats' => $dashboardData['activity_stats'],
+            'recent_users' => $dashboardData['recent_users'],
+            'recent_exams' => $dashboardData['recent_exams'],
+            'role_distribution' => $dashboardData['role_distribution']
+        ]);
     }
 }

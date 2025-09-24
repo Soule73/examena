@@ -1,66 +1,47 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useToast } from '@/Components/Toast';
-import { FlashMessages } from '@/types';
+import { FlashMessageObject, FlashMessages } from '@/types';
 
 interface FlashToastHandlerProps {
     flash: FlashMessages;
 }
 
+const displayedIds = new Set<string>();
+
 const FlashToastHandler: React.FC<FlashToastHandlerProps> = ({ flash }) => {
     const { success, error, warning, info } = useToast();
-    const processedMessages = useRef<Set<string>>(new Set());
 
     useEffect(() => {
-        const messageKey = JSON.stringify(flash);
+        const showToast = (type: 'success' | 'error' | 'warning' | 'info' | 'message', data?: FlashMessageObject) => {
+            if (!data || !data.id || !data.message) return;
 
-        if (processedMessages.current.has(messageKey)) {
-            return;
-        }
+            if (displayedIds.has(data.id)) return;
 
-        let hasMessages = false;
+            displayedIds.add(data.id);
 
-        if (flash.success) {
-            success(flash.success, {
-                title: 'Succès',
-                duration: 4000
-            });
-            hasMessages = true;
-        }
+            switch (type) {
+                case 'success':
+                    success(data.message, { title: 'Succès', duration: 4000 });
+                    break;
+                case 'error':
+                    error(data.message, { title: 'Erreur', autoClose: false });
+                    break;
+                case 'warning':
+                    warning(data.message, { title: 'Attention', duration: 6000 });
+                    break;
+                case 'info':
+                    info(data.message, { title: 'Information', duration: 5000 });
+                    break;
+                case 'message':
+                    info(data.message, { duration: 5000 });
+                    break;
+            }
+        };
 
-        if (flash.error) {
-            error(flash.error, {
-                title: 'Erreur',
-                autoClose: false
-            });
-            hasMessages = true;
-        }
-
-        if (flash.warning) {
-            warning(flash.warning, {
-                title: 'Attention',
-                duration: 6000
-            });
-            hasMessages = true;
-        }
-
-        if (flash.info) {
-            info(flash.info, {
-                title: 'Information',
-                duration: 5000
-            });
-            hasMessages = true;
-        }
-
-        if (flash.message) {
-            info(flash.message, {
-                duration: 5000
-            });
-            hasMessages = true;
-        }
-
-        if (hasMessages) {
-            processedMessages.current.add(messageKey);
-        }
+        showToast('success', flash.success);
+        showToast('error', flash.error);
+        showToast('warning', flash.warning);
+        showToast('info', flash.info);
     }, [flash, success, error, warning, info]);
 
     return null;

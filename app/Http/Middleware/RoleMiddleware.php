@@ -7,6 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Middleware to check if the authenticated user has the required role(s).
+ *
+ * This middleware verifies the user's role before allowing access to certain routes.
+ * If the user does not have the required role, they will be redirected or denied access.
+ *
+ * Usage:
+ * Apply this middleware to routes or controllers that require role-based authorization.
+ *
+ * @package App\Http\Middleware
+ */
 class RoleMiddleware
 {
     /**
@@ -19,10 +30,9 @@ class RoleMiddleware
         }
 
         $user = Auth::user();
-        
-        // Vérifier si l'utilisateur a l'un des rôles requis
+
         if (!$user->hasAnyRole($roles)) {
-            abort(403, 'Accès refusé. Vous n\'avez pas les permissions nécessaires.');
+            abort(403, "Accès refusé. Vous n'avez pas les permissions nécessaires.");
         }
 
         return $next($request);

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $content The display text of the choice.
  * @property int $question_id The ID of the related question.
  * @property bool $is_correct Indicates if this choice is the correct answer.
+ * @property int $order_index The display order of the choice within its question.
  * @property \Illuminate\Support\Carbon|null $created_at Timestamp when the choice was created.
  * @property \Illuminate\Support\Carbon|null $updated_at Timestamp when the choice was last updated.
  *
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Choice query()
  *
  * @property-read \App\Models\Question $question The question to which the choice belongs.
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Answer> $answers The answers associated with this choice.
  *
  * @mixin \Eloquent
  */
@@ -40,6 +42,7 @@ class Choice extends Model
         'question_id',
         'content',
         'is_correct',
+        'order_index',
     ];
 
     /**
@@ -62,5 +65,15 @@ class Choice extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
+    }
+
+    /**
+     * Get the answers associated with this choice.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Answer>
+     */
+    public function answers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Answer::class);
     }
 }

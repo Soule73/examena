@@ -1,10 +1,47 @@
 @import 'tailwindcss';
 @import 'easymde/dist/easymde.min.css';
 
+body {
+    font-family: 'Inter', sans-serif;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+
+/* Animation personnalisée pour la barre de progression des toasts */
+@keyframes shrink {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0);
+    }
+}
+
+.toast-progress {
+    animation: shrink var(--duration) linear forwards;
+}
+
+/* Styles pour les toasts */
+.word-break {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Empêcher le débordement horizontal dans les toasts */
+.toast-container {
+    max-width: calc(100vw - 2rem);
+    overflow: hidden;
+}
+
+/* Empêcher le défilement horizontal global */
+body {
+    overflow-x: hidden;
+}
 
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',

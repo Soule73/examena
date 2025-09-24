@@ -48,25 +48,25 @@ export const MobileNavigation = ({ isAdmin, isTeacher, isStudent, currentHref, i
                         >
                             Mes Examens
                         </NavLink>
-                        <NavLink
+                        {/* <NavLink
                             href={route('teacher.results.index')}
                             isActive={isActiveLink(route('teacher.results.index'), currentHref)}
                             variant="mobile"
                         >
                             Résultats
-                        </NavLink>
+                        </NavLink> */}
                     </>
                 )}
 
                 {isAdmin && (
                     <>
-                        <NavLink
+                        {/* <NavLink
                             href={route('admin.exams.index')}
                             isActive={isActiveLink(route('admin.exams.index'), currentHref)}
                             variant="mobile"
                         >
                             Gérer Examens
-                        </NavLink>
+                        </NavLink> */}
                         <NavLink
                             href={route('admin.users.index')}
                             isActive={isActiveLink(route('admin.users.index'), currentHref)}

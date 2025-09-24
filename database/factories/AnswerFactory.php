@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Answer;
 use App\Models\User;
 use App\Models\Question;
+use App\Models\ExamAssignment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +23,7 @@ class AnswerFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
+            'assignment_id' => ExamAssignment::factory(),
             'question_id' => Question::factory(),
             'answer_text' => $this->faker->sentence(),
         ];

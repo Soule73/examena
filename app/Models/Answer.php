@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $question_id The ID of the related question.
  * @property int|null $choice_id The ID of the selected choice (if applicable).
  * @property string|null $answer_text The text of the answer (for text-based questions).
+ * @property float|null $score The score obtained for this answer, if applicable.
  * @property \Carbon\Carbon|null $created_at The date and time when the answer was created.
  * @property \Carbon\Carbon|null $updated_at The date and time when the answer was last updated.
  *
@@ -40,7 +41,20 @@ class Answer extends Model
         'question_id',
         'choice_id',
         'answer_text',
+        'score',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    public function cast(): array
+    {
+        return [
+            'score' => 'float',
+        ];
+    }
 
     /**
      * Get the assignment that this answer belongs to.

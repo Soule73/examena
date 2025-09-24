@@ -3,12 +3,13 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class PermissionHelper
 {
     /**
-     * Vérifier si l'utilisateur connecté est un enseignant
+     * Determines if the currently authenticated user has the 'teacher' role.
+     *
+     * @return bool Returns true if the user is a teacher, false otherwise.
      */
     public static function isTeacher(): bool
     {
@@ -16,7 +17,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur connecté est un étudiant
+     * Determines if the currently authenticated user has the 'student' role.
+     *
+     * @return bool Returns true if the user is a student, false otherwise.
      */
     public static function isStudent(): bool
     {
@@ -24,7 +27,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur connecté est un admin
+     * Determines if the currently authenticated user has the 'admin' role.
+     *
+     * @return bool Returns true if the user is an admin, false otherwise.
      */
     public static function isAdmin(): bool
     {
@@ -32,7 +37,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur peut gérer les examens
+     * Determines if the currently authenticated user can manage exams.
+     *
+     * @return bool Returns true if the user can manage exams, false otherwise.
      */
     public static function canManageExams(): bool
     {
@@ -40,7 +47,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur peut passer des examens
+     * Determines if the currently authenticated user can take exams.
+     *
+     * @return bool Returns true if the user can take exams, false otherwise.
      */
     public static function canTakeExams(): bool
     {
@@ -48,7 +57,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur peut voir tous les résultats
+     * Determines if the currently authenticated user can view all exam results.
+     *
+     * @return bool Returns true if the user can view all exam results, false otherwise.
      */
     public static function canViewAllResults(): bool
     {
@@ -56,7 +67,9 @@ class PermissionHelper
     }
 
     /**
-     * Vérifier si l'utilisateur peut exporter des données
+     * Determines if the currently authenticated user can export data.
+     *
+     * @return bool Returns true if the user can export data, false otherwise.
      */
     public static function canExportData(): bool
     {
@@ -64,7 +77,11 @@ class PermissionHelper
     }
 
     /**
-     * Obtenir le rôle principal de l'utilisateur connecté
+     * Get the main role of the authenticated user.
+     * 
+     * Prioritizes roles in the order: admin > teacher > student.
+     * 
+     * @return string|null The main role of the user, or null if not authenticated or no role found.
      */
     public static function getUserMainRole(): ?string
     {
@@ -74,8 +91,7 @@ class PermissionHelper
 
         $user = Auth::user();
         $roles = $user->getRoleNames();
-        
-        // Prioriser admin > teacher > student
+
         if ($roles->contains('admin')) {
             return 'admin';
         } elseif ($roles->contains('teacher')) {
@@ -88,20 +104,18 @@ class PermissionHelper
     }
 
     /**
-     * Rediriger vers le tableau de bord approprié selon le rôle
+     * Get the dashboard route based on the user's role.
      */
     public static function getDashboardRoute(): string
     {
         $role = self::getUserMainRole();
-        
-        // Debug temporaire
-        Log::info('Debug redirection - Role detecté: ' . $role . ' pour utilisateur: ' . (Auth::check() ? Auth::user()->email : 'non connecté'));
-        
-        return match($role) {
-            'admin' => '/dashboard/admin',
-            'teacher' => '/dashboard/teacher',
-            'student' => '/dashboard/student',
-            default => '/dashboard'
+
+
+        return match ($role) {
+            'admin' => route('admin.dashboard'),
+            'teacher' => route('teacher.dashboard'),
+            'student' => route('student.dashboard'),
+            default => route('dashboard')
         };
     }
 }

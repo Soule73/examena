@@ -5,8 +5,9 @@ import { ChartBarIcon, CheckIcon, ClockIcon, DocumentTextIcon } from '@heroicons
 import StatCard from '@/Components/StatCard';
 import Section from '@/Components/Section';
 import { Button } from '@/Components';
+import StudentExamAssignmentList from '@/Components/exam/StudentExamAssignmentList';
 import { ExamAssignment, User } from '@/types';
-import ExamList from '@/Components/ExamList';
+import { PaginationType } from '@/types/datatable';
 
 interface Stats {
     totalExams: number;
@@ -18,11 +19,10 @@ interface Stats {
 interface Props {
     user: User;
     stats: Stats;
-    recentAssignments: ExamAssignment[];
+    examAssignments: PaginationType<ExamAssignment>;
 }
 
-export default function StudentDashboard({ user, stats, recentAssignments }: Props) {
-
+export default function StudentDashboard({ user, stats, examAssignments }: Props) {
     return (
         <AuthenticatedLayout title='Tableau de bord étudiant'>
 
@@ -31,6 +31,7 @@ export default function StudentDashboard({ user, stats, recentAssignments }: Pro
                     <Button
                         size='sm'
                         variant='outline'
+                        className=' w-max'
                         onClick={() => router.visit(route('student.exams.index'))}>
                         Voir mes examens
                     </Button>
@@ -66,76 +67,26 @@ export default function StudentDashboard({ user, stats, recentAssignments }: Pro
                     />
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Progression</h3>
-                    <LineProgressBar
-                        label="Examens terminés"
-                        current={stats.completedExams}
-                        total={stats.totalExams}
-                    />
-                </div>
-
-                {stats.totalExams === 0 && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                        <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun examen disponible</h3>
-                        <p className="text-gray-600">
-                            Vous n'avez actuellement aucun examen.
-                        </p>
-                    </div>
-                )}
-
             </Section>
-            <Section title="Derniers examens assignés"
+
+            <Section title="Examens assignés"
                 actions={
                     <Button
                         size='sm'
                         variant='outline'
+                        className=' w-max'
                         onClick={() => router.visit(route('student.exams.index'))}>
                         Voir tous les examens
                     </Button>
                 }
             >
-                {recentAssignments.length === 0 ? (
-                    <p className="text-gray-500">Aucun examen assigné récemment.</p>
-                ) : (
-                    <ExamList assignments={recentAssignments} />
-                )}
+                <StudentExamAssignmentList
+                    data={examAssignments}
+                    variant="dashboard"
+                    showFilters={false}
+                    showSearch={true}
+                />
             </Section>
         </AuthenticatedLayout>
-    );
-}
-
-interface LineProgressBarProps {
-    label: string;
-    current: number;
-    total: number;
-    color?: 'blue' | 'green' | 'purple' | 'red' | 'yellow';
-}
-
-const LineProgressBar: React.FC<LineProgressBarProps> = ({ label, current, total, color = 'blue' }) => {
-    const percentage = total > 0 ? (current / total) * 100 : 0;
-
-    const colorClasses = {
-        blue: 'bg-blue-600',
-        green: 'bg-green-600',
-        purple: 'bg-purple-600',
-        red: 'bg-red-600',
-        yellow: 'bg-yellow-600',
-    };
-
-    return (
-        <div>
-            <div className="flex justify-between text-sm text-gray-600 mb-1">
-                <span>{label}</span>
-                <span>{current}/{total}</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                    className={`${colorClasses[color]} h-2 rounded-full transition-all duration-300`}
-                    style={{ width: `${percentage}%` }}
-                ></div>
-            </div>
-        </div>
     );
 }

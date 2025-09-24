@@ -48,27 +48,27 @@ export const DesktopNavigation = ({ isAdmin, isTeacher, isStudent, currentHref }
                     >
                         Mes Examens
                     </NavLink>
-                    <NavLink
+                    {/* <NavLink
                         href={route('teacher.results.index')}
                         icon="results"
                         isActive={isActiveLink(route('teacher.results.index'), currentHref)}
                         variant="desktop"
                     >
                         Résultats
-                    </NavLink>
+                    </NavLink> */}
                 </>
             )}
 
             {isAdmin && (
                 <>
-                    <NavLink
+                    {/* <NavLink
                         href={route('admin.exams.index')}
                         icon="manage-exams"
                         isActive={isActiveLink(route('admin.exams.index'), currentHref)}
                         variant="desktop"
                     >
                         Gérer Examens
-                    </NavLink>
+                    </NavLink> */}
                     <NavLink
                         href={route('admin.users.index')}
                         icon="users"

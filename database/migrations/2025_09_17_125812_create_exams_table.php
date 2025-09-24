@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->integer('duration'); // en minutes
+            $table->datetime('start_time')->nullable();
+            $table->datetime('end_time')->nullable();
+            $table->boolean('is_active')->default(false);
             $table->foreignId('teacher_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

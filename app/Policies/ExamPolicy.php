@@ -21,7 +21,6 @@ class ExamPolicy
      */
     public function view(User $user, Exam $exam): bool
     {
-        // Un enseignant peut voir ses propres examens, un admin peut tout voir
         return $user->hasRole('admin') || $exam->teacher_id === $user->id;
     }
 

@@ -15,8 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->text('content');
-            $table->enum('type', ['text', 'multiple_choice', 'true_false'])->default('text');
+            $table->enum('type', ['text', 'multiple', 'one_choice', 'boolean'])->default('text');
+            $table->integer('points')->default(1);
+            $table->integer('order_index')->default(1);
+
+
             $table->timestamps();
+
+            // Index pour les requêtes fréquentes
+            $table->index(['exam_id', 'order_index']);
         });
     }
 

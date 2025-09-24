@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $type The type of the question Available(‘multiple_choice’, ‘true_false’, ‘one_choice’, ‘text’).
  * @property int $points The points assigned to the question.
  * @property int $exam_id The ID of the related exam.
+ * @property int $order_index The order index of the question within the exam.
  * @property \Illuminate\Support\Carbon|null $created_at The date and time when the question was created.
  * @property \Illuminate\Support\Carbon|null $updated_at The date and time when the question was last updated.
  *
@@ -40,11 +41,22 @@ class Question extends Model
      *
      * @var list<string>
      */
-    protected $fillable = [ 
+    protected $fillable = [
         'exam_id',
         'content',
         'type',
         'points',
+        'order_index',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'points' => 1,
+        'order_index' => 1,
     ];
 
     /**
@@ -64,7 +76,7 @@ class Question extends Model
      */
     public function choices(): HasMany
     {
-        return $this->hasMany(Choice::class);
+        return $this->hasMany(Choice::class)->orderBy('order_index');
     }
 
     /**
@@ -75,5 +87,15 @@ class Question extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('ordered', function ($builder) {
+            $builder->orderBy('order_index');
+        });
     }
 }

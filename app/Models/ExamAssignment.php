@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ExamAssignment extends Model
 {
+    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
@@ -50,11 +52,19 @@ class ExamAssignment extends Model
         'score',
         'auto_score',
         'status',
-        'attempt_number',
         'teacher_notes',
         'security_violations',
         'forced_submission',
-        'time_spent',
+    ];
+
+    /**
+     * The model's default values for attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'assigned',
+        'forced_submission' => false,
     ];
 
     /**

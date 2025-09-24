@@ -1,0 +1,64 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "useDefineForClassFields": true,
+        "lib": [
+            "ES2020",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "module": "ESNext",
+        "skipLibCheck": true,
+        "allowJs": true,
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "jsxImportSource": "react",
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        /* Path mapping */
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./resources/ts/*"
+            ],
+            "@/Types/*": [
+                "./resources/ts/types/*"
+            ],
+            "@/Components/*": [
+                "./resources/ts/Components/*"
+            ],
+            "@/Pages/*": [
+                "./resources/ts/Pages/*"
+            ],
+            "@/Layouts/*": [
+                "./resources/ts/Layouts/*"
+            ],
+            "@/Hooks/*": [
+                "./resources/ts/hooks/*"
+            ],
+            "@/Utils/*": [
+                "./resources/ts/utils/*"
+            ]
+        }
+    },
+    "include": [
+        "resources/ts/**/*.ts",
+        "resources/ts/**/*.tsx",
+        "resources/ts/**/*.d.ts",
+        "resources/ts/hooks/useExamResults.tx",
+        "resources/ts/Pages/Teacher/ExamCreate.backup"
+    ],
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        }
+    ]
+}

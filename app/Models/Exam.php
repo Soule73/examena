@@ -90,7 +90,7 @@ class Exam extends Model
      */
     public function questions(): HasMany
     {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(Question::class)->orderBy('order_index');
     }
 
     /**
@@ -102,7 +102,17 @@ class Exam extends Model
     {
         return $this->hasMany(ExamAssignment::class);
     }
-    
+
+    /**
+     * Get all answers associated with the exam through questions.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Answer>
+     */
+    public function answers(): HasManyThrough
+    {
+        return $this->hasManyThrough(Answer::class, Question::class);
+    }
+
     /**
      * Get the count of unique participants for the exam.
      * 
@@ -122,7 +132,7 @@ class Exam extends Model
      *
      * @return int The sum of all points assigned to the exam.
      */
-    public function getTotalPointsAttribute(): int
+    public function totalPointsAttribute(): int
     {
         return $this->questions
             ->whereNotNull('points')

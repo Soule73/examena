@@ -19,16 +19,16 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('submitted_at')->nullable();
             $table->decimal('score', 5, 2)->nullable();
-            $table->enum('status', ['assigned', 'started', 'submitted', 'graded'])->default('assigned');
+            $table->integer('auto_score')->nullable()->comment('Score automatique des QCM');
+            $table->enum('status', ['assigned', 'started', 'submitted', 'pending_review', 'graded'])->default('assigned');
             $table->text('teacher_notes')->nullable();
+            $table->json('security_violations')->nullable()->comment('Violations de sécurité détectées pendant l\'examen');
+            $table->boolean('forced_submission')->default(false)->comment('Soumission forcée par timeout ou détection de triche');
             $table->timestamps();
 
-            // Contrainte d'unicité pour éviter les assignations dupliquées
             $table->unique(['exam_id', 'student_id']);
-            
-            // Index pour les requêtes fréquentes
-            $table->index(['exam_id', 'status']);
-            $table->index(['student_id', 'status']);
+
+            $table->index(['exam_id', 'student_id', 'status']);
         });
     }
 
