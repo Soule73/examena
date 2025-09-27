@@ -36,8 +36,8 @@ class ExamSeeder extends Seeder
             'description' => 'Test complet sur les équations, fonctions et géométrie avec différents types de questions',
             'teacher_id' => $teacher->id,
             'duration' => 90,
-            'start_time' => now()->addDays(7),
-            'end_time' => now()->addDays(10),
+            'start_time' => now(),
+            'end_time' => now()->addDays(2),
             'is_active' => true,
         ]);
 
@@ -154,13 +154,13 @@ Démontrez que la somme des angles intérieurs d\'un triangle est égale à 180�
     {
         // Examen 2: Informatique
         $csExam = \App\Models\Exam::create([
-            'title' => 'Examen d\'Informatique - Programmation et Algorithmes',
+            'title' => "Examen d'Informatique - Programmation et Algorithmes",
             'description' => 'Test sur les concepts de programmation, structures de données et algorithmes',
             'teacher_id' => $teacher->id,
             'duration' => 120,
-            'start_time' => now()->addDays(5),
-            'end_time' => now()->addDays(8),
-            'is_active' => false,
+            'start_time' => now(),
+            'end_time' => now()->addDays(2),
+            'is_active' => true,
         ]);
 
         // Question 1: Choix unique sur les langages
@@ -288,11 +288,11 @@ Pour chaque principe, vous devez :
         // Examen 3: Philosophie
         $philoExam = \App\Models\Exam::create([
             'title' => 'Examen de Philosophie - Éthique et Métaphysique',
-            'description' => 'Questions sur les grands concepts philosophiques et l\'éthique',
+            'description' => "Questions sur les grands concepts philosophiques et l'éthique",
             'teacher_id' => $teacher->id,
             'duration' => 150,
-            'start_time' => now()->addDays(12),
-            'end_time' => now()->addDays(15),
+            'start_time' => now(),
+            'end_time' => now()->addDays(2),
             'is_active' => true,
         ]);
 
